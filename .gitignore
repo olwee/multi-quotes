@@ -4,3 +4,5 @@ node_modules/
 server/node_modules
 server/build
 
+# VIM
+*.sw?
