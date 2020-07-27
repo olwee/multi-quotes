@@ -78,13 +78,107 @@ const LimitLevelList = (
     cache.tail = limitLevel;
   };
 
+  const remove = (limitLevel) => {
+    if (limitLevel.px === cache.head.px) {
+      cache.head = limitLevel.getNext();
+    } else if (limitLevel.px === cache.tail.px) {
+      cache.tail = limitLevel.getPrev();
+    }
+    limitLevel.remove();
+  };
+
+  const getLevels = (max = 300) => {
+    let counter = 0;
+    const levels = [];
+    let current = cache.head;
+    while (current !== null && counter < max) {
+      levels.push([current.px, current.qty]);
+      current = current.getNext();
+      counter += 1;
+    }
+    return levels;
+  };
+
   return {
     cache,
     add,
+    remove,
+    getLevels,
+  };
+};
+
+const Orderbook = () => {
+  const cache = {
+    pxMap: {},
+    bids: LimitLevelList(true),
+    asks: LimitLevelList(false),
+    seq: 0,
+    lastUpdated: 0,
+  };
+
+  const processSingle = (limitLevel) => {
+    const { px, qty, isBid } = limitLevel;
+    const savedLevel = cache.pxMap[px];
+    if (qty === 0) {
+      // Remove
+      if (typeof savedLevel !== 'undefined') {
+        if (savedLevel.isBid === true) {
+          cache.bids.remove(savedLevel);
+        } else {
+          cache.asks.remove(savedLevel);
+        }
+        delete cache.pxMap[px];
+      }
+      return;
+    }
+    if (typeof savedLevel !== 'undefined') {
+      // Update
+      savedLevel.qty = qty;
+      return;
+    }
+    // Add
+    cache.pxMap[px] = limitLevel;
+    if (isBid === true) cache.bids.add(limitLevel);
+    if (isBid === false) cache.asks.add(limitLevel);
+  };
+
+  const process = ({
+    limitLevels,
+    exchTS,
+    exchSeq,
+  }) => {
+    limitLevels.forEach((limitLevel) => {
+      processSingle(limitLevel);
+    });
+    cache.seq = exchSeq;
+    cache.lastUpdated = exchTS;
+  };
+
+  const getBestQuote = () => {
+    const askLevels = cache.asks.getLevels(1);
+    const bidLevels = cache.bids.getLevels(1);
+    const [[bestAskPx, bestAskQty]] = askLevels;
+    const [[bestBidPx, bestBidQty]] = bidLevels;
+    const spread = bestAskPx - bestBidPx;
+    return {
+      bidPx: bestBidPx,
+      bidQty: bestBidQty,
+      askPx: bestAskPx,
+      askQty: bestAskQty,
+      spread,
+      seq: cache.seq,
+      lastUpdated: cache.lastUpdated,
+    };
+  };
+
+  return {
+    process,
+    getBestQuote,
   };
 };
 
 export {
   LimitLevel,
   LimitLevelList,
+  Orderbook,
 };
