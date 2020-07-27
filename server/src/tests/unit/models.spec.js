@@ -1,4 +1,5 @@
 import path from 'path';
+import { assert } from 'chai';
 import { createPool, sql } from 'slonik';
 import fs from 'fs-extra';
 import db from '../../models/db';
@@ -35,7 +36,40 @@ describe('# Test Models', () => {
       const baSpread = bestAskPx - bestBidPx;
       // Timestamp in microseconds
       const lastUpdated = 1595740700000000;
-      await pool.connect(async (conn) => {
+
+      const actual = await pool.connect(async (conn) => {
+        const result = await Models.Quote.createOne(conn)(
+          bestBidPx,
+          bestAskPx,
+          bestBidQty,
+          bestAskQty,
+          baSpread,
+          lastUpdated,
+        );
+        return result;
+      });
+      assert.deepEqual(actual, {
+        id: 1,
+        bestBidPx,
+        bestAskPx,
+        bestBidQty,
+        bestAskQty,
+        baSpread,
+        lastUpdated,
+      });
+    });
+    it('should be able to get the latest quote', async () => {
+      // BTCUSDT Base Prec = 2
+      // Pair Prec = 6
+      const bestBidPx = 100100;
+      const bestAskPx = 100200;
+      const bestBidQty = 1000000;
+      const bestAskQty = 2000000;
+      const baSpread = bestAskPx - bestBidPx;
+      // Timestamp in microseconds
+      const lastUpdated = 1595740800000000;
+
+      const actual = await pool.connect(async (conn) => {
         await Models.Quote.createOne(conn)(
           bestBidPx,
           bestAskPx,
@@ -44,6 +78,17 @@ describe('# Test Models', () => {
           baSpread,
           lastUpdated,
         );
+        const result = await Models.Quote.getLatest(conn)();
+        return result;
+      });
+      assert.deepEqual(actual, {
+        id: 2,
+        bestBidPx,
+        bestAskPx,
+        bestBidQty,
+        bestAskQty,
+        baSpread,
+        lastUpdated,
       });
     });
     after(async () => {

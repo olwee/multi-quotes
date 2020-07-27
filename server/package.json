@@ -29,9 +29,13 @@
   "dependencies": {
     "@babel/runtime": "^7.10.5",
     "bignumber.js": "^9.0.0",
+    "bufferutil": "^4.0.1",
+    "dotenv": "^8.2.0",
     "fs-extra": "^9.0.1",
     "pino": "^6.3.2",
     "slonik": "^22.4.11",
-    "umzug": "^2.3.0"
+    "umzug": "^2.3.0",
+    "utf-8-validate": "^5.0.2",
+    "ws": "^7.3.1"
   }
 }

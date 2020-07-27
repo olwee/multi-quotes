@@ -6,6 +6,7 @@ import {
 
 // eslint-disable-next-line no-unused-vars
 const Quote = (
+  id,
   bestBidPx,
   bestAskPx,
   bestBidQty,
@@ -13,6 +14,7 @@ const Quote = (
   baSpread,
   lastUpdated,
 ) => ({
+  id,
   bestBidPx,
   bestAskPx,
   bestBidQty,
@@ -94,14 +96,22 @@ Quote.getLatest = (conn) => async () => {
   try {
     result = await conn.one(sql`
       SELECT * FROM quotes
-      ORDER BY lastUpdated DESC
-      LIMIT 1; 
+      ORDER BY last_updated DESC
+      LIMIT 1;
     `);
   } catch (err) {
     if (err instanceof NotFoundError) return result;
     if (err instanceof DataIntegrityError) return result;
   }
-  return result;
+  return Quote(
+    result.id,
+    result.best_bid_px,
+    result.best_ask_px,
+    result.best_bid_qty,
+    result.best_ask_qty,
+    result.ba_spread,
+    result.last_updated,
+  );
 };
 
 export default Quote;
