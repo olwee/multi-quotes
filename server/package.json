@@ -24,7 +24,8 @@
     "mocha": "^6.1.4",
     "nock": "^11.7.0",
     "nyc": "^15.0.0",
-    "sinon": "7.2.2"
+    "sinon": "7.2.2",
+    "supertest": "^4.0.2"
   },
   "dependencies": {
     "@babel/runtime": "^7.10.5",

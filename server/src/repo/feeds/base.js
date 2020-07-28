@@ -1,20 +1,22 @@
-import WebSocket from 'ws';
+// import WebSocket from 'ws';
 
 const Feed = (
-  wsURI,
+  ws,
   {
     onConnect,
     onData,
   },
 ) => {
-  const ws = new WebSocket(wsURI);
+  console.log('baseFeed');
+  const wsConn = ws();
+  console.log(wsConn);
 
   const send = async (payload) => {
-    ws.send(JSON.stringify(payload));
+    wsConn.send(JSON.stringify(payload));
   };
-
-  ws.on('open', async () => onConnect({ send, ws }));
-  ws.on('message', async (msg) => onData(msg, { send, ws }));
+  console.log('Listening to on open, on message');
+  wsConn.on('open', async () => onConnect({ send, ws: wsConn }));
+  wsConn.on('message', async (msg) => onData(msg, { send, ws: wsConn }));
 };
 
 export default Feed;

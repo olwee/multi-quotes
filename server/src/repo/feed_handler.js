@@ -12,37 +12,46 @@ const quote = ({
   return { toString };
 };
 
-const FeedHandler = ({ conn, Models }) => {
+const FeedHandler = ({ ws, pool, Models }) => {
+  //
   const lastQuote = quote({
     bidPx: 0,
     bidQty: 0,
     askPx: 0,
     askQty: 0,
   });
-  const wsURI = process.env.WS_URI;
+  // const wsURI = process.env.WS_URI;
   const LOB = Orderbook();
   const { publisher, ...multiFeedConfig } = Feeds.MultiFeed();
-  BaseFeed(wsURI, multiFeedConfig);
-
-  const quoteCreator = Models.Quote.createOne(conn);
+  BaseFeed(ws, multiFeedConfig);
 
   publisher.on('book-update', async (updatePayload) => {
     LOB.process(updatePayload);
     const bestQuote = LOB.getBestQuote();
     const newQuote = quote(bestQuote);
     if (newQuote.toString() !== lastQuote.toString()) {
-      await quoteCreator(
-        bestQuote.bidPx,
-        bestQuote.askPx,
-        bestQuote.bidQty,
-        bestQuote.askQty,
-        bestQuote.spread,
-        bestQuote.exchSeq,
-      );
+      pool.connect(async (conn) => {
+        await Models.Quote.createOne(conn)(
+          bestQuote.bidPx,
+          bestQuote.askPx,
+          bestQuote.bidQty,
+          bestQuote.askQty,
+          bestQuote.spread,
+          bestQuote.seq,
+          0,
+        );
+      });
       // Update lastQuote
       Object.assign(lastQuote, newQuote);
     }
   });
+  /*
+  pool.connect(async (conn) => {
+
+    const quoteCreator = Models.Quote.createOne(conn);
+
+  });
+  */
 };
 
 export default FeedHandler;

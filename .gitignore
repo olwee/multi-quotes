@@ -4,5 +4,9 @@ node_modules/
 server/node_modules
 server/build
 
+# Istanbul
+server/coverage
+server/.nyc_output
+
 # VIM
 *.sw?

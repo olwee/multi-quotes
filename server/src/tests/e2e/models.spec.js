@@ -20,6 +20,7 @@ describe('# Test Models', () => {
       await conn.query(sql`CREATE DATABASE testdb;`);
     });
     await pool.end();
+    console.log('Models testdb created...');
   });
   describe('# Quotes', () => {
     let pool = {};
@@ -98,6 +99,7 @@ describe('# Test Models', () => {
       });
     });
     after(async () => {
+      console.log('Models testdb torn down...');
       await db.teardown();
     });
   });

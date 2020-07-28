@@ -13,6 +13,7 @@ const MultiFeed = () => {
   const publisher = new EventEmitter();
 
   const onConnect = async ({ send }) => {
+    console.log('ON Connect called...');
     let reqId = await randomInt();
     send({
       id: reqId,

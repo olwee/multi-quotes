@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import Quote from './quotes';
 
-const router = Router();
-router.use('/quotes', Quote);
+export default ({ pool, Models }) => {
+  const router = Router();
 
-export default router;
+  router.use('/quotes', Quote({ pool, Models }));
+
+  return router;
+};
