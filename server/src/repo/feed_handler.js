@@ -1,3 +1,4 @@
+import moment from 'moment';
 import Feeds from './feeds/index';
 import BaseFeed from './feeds/base';
 import { Orderbook } from './orderbook';
@@ -27,10 +28,11 @@ const FeedHandler = ({ ws, pool, Models }) => {
 
   publisher.on('book-update', async (updatePayload) => {
     LOB.process(updatePayload);
+    const localTS = moment.utc().valueOf();
     const bestQuote = LOB.getBestQuote();
     const newQuote = quote(bestQuote);
     if (newQuote.toString() !== lastQuote.toString()) {
-      pool.connect(async (conn) => {
+      await pool.connect(async (conn) => {
         await Models.Quote.createOne(conn)(
           bestQuote.bidPx,
           bestQuote.askPx,
@@ -38,7 +40,7 @@ const FeedHandler = ({ ws, pool, Models }) => {
           bestQuote.askQty,
           bestQuote.spread,
           bestQuote.seq,
-          0,
+          localTS,
         );
       });
       // Update lastQuote

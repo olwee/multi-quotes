@@ -14,8 +14,7 @@ const App = async (loaders) => {
   } = await loaders();
   const pool = await db.setup();
   // Start Feed Handler
-  console.log('Starting feed handler...');
-  Repo.FeedHandler({ ws, pool, Models });
+  await Repo.FeedHandler({ ws, pool, Models });
   // Start server
   const app = express();
   app.use(cors());

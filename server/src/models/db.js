@@ -24,11 +24,8 @@ const getAgent = async (connPool) => {
 };
 
 const setup = async () => {
-  console.log('creating connPool');
-  console.log(process.env.DATABASE_URI);
   const connPool = createPool(process.env.DATABASE_URI);
   const agent = await getAgent(connPool);
-  console.log('Run migrations');
   const pendingMigrations = await agent
     .pending()
     .map(({ file }) => file);

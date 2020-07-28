@@ -103,7 +103,8 @@ Quote.getLatest = (conn) => async () => {
   try {
     result = await conn.one(sql`
       SELECT * FROM quotes
-      ORDER BY last_updated DESC
+      ORDER BY last_updated DESC,
+      exch_seq DESC
       LIMIT 1;
     `);
   } catch (err) {

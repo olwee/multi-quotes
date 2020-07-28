@@ -42,22 +42,20 @@ describe('# End To End Tests For the App', () => {
       emitter.emit('message', feedFixtures.bookUpdate0);
       emitter.emit('message', feedFixtures.bookUpdate1);
       emitter.emit('message', feedFixtures.bookUpdate2);
-      await wait(200);
+      await wait(100);
       const result = await request(app)
         .get('/api/v1/quotes')
         .expect(200);
       const { body } = result;
-      assert.deepEqual(body, {
-        error: null,
-        result: {
-          bidPx: '10239.14',
-          askPx: '10246.89',
-          bidQty: '0.135332',
-          askQty: '0.101783',
-          spread: '7.75',
-          seq: 2,
-          lastUpdated: 0,
-        },
+      const { error, result: { lastUpdated, ...quoteRes } } = body;
+      assert.equal(error, null);
+      assert.deepEqual(quoteRes, {
+        bidPx: '10239.14',
+        askPx: '10246.89',
+        bidQty: '0.135332',
+        askQty: '0.101783',
+        spread: '7.75',
+        seq: 2,
       });
     });
     after(async () => {

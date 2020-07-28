@@ -9,7 +9,6 @@ export default ({ pool, Models }) => {
 
   const router = Router();
   router.get('/', async (req, res) => {
-    console.log('Quotes endpoint called...');
     // Fetch latest quote from DB
     await pool.connect(async (conn) => {
       const quoteRaw = await Models.Quote.getLatest(conn)();
