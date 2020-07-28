@@ -1,3 +1,4 @@
+import EventEmitter from 'events';
 import BN from 'bignumber.js';
 import { randomInt } from '../../utils';
 import { LimitLevel } from '../orderbook';
@@ -8,6 +9,8 @@ const MultiFeed = () => {
 
   const baseOffset = BN(`1e${basePrec}`);
   const pairOffset = BN(`1e${pairPrec}`);
+
+  const publisher = new EventEmitter();
 
   const onConnect = async ({ send }) => {
     let reqId = await randomInt();
@@ -27,6 +30,11 @@ const MultiFeed = () => {
   const handleBookUpdate = (params) => {
     const exchSeq = params[1];
     const bookData = params[2];
+    const pair = params[3];
+    // We receive other pairs from time to time for some reason...
+    if (pair !== 'BTCUSDT') {
+      return { limitLevels: [], exchTS: 0, exchSeq: -1 };
+    }
     const { asks: rawAsks, bids: rawBids } = bookData;
     const limitLevelAsks = rawAsks.map(([rawPx, rawQty]) => {
       const px = parseInt(BN(rawPx).times(baseOffset).toFixed(), 10);
@@ -39,20 +47,33 @@ const MultiFeed = () => {
       return LimitLevel(px, qty, true);
     });
     const limitLevels = [...limitLevelAsks, ...limitLevelBids];
-    return {
+
+    const payload = {
       limitLevels,
       exchTS: 0,
       exchSeq,
     };
+
+    publisher.emit('book-update', payload);
+    return payload;
   };
 
-  const onData = async (msg) => {
-    console.log(msg);
+  const msgRouter = {
+    'depth.update': handleBookUpdate,
+  };
+
+  const onData = async (rawMsg) => {
+    const msg = JSON.parse(rawMsg);
+    const { method, params } = msg;
+    if (Object.prototype.hasOwnProperty.call(msgRouter, method)) {
+      msgRouter[method](params);
+    }
   };
   return {
     onConnect,
     onData,
     handleBookUpdate,
+    publisher,
   };
 };
 

@@ -12,6 +12,7 @@ const Quote = (
   bestBidQty,
   bestAskQty,
   baSpread,
+  exchSeq,
   lastUpdated,
 ) => ({
   id,
@@ -20,6 +21,7 @@ const Quote = (
   bestBidQty,
   bestAskQty,
   baSpread,
+  exchSeq,
   lastUpdated,
 });
 
@@ -37,6 +39,7 @@ Quote.Up = async (conn) => {
       best_bid_qty int NOT NULL,
       best_ask_qty int NOT NULL,
       ba_spread int NOT NULL,
+      exch_seq int NOT NULL,
       last_updated bigint NOT NULL
     );
   `);
@@ -58,6 +61,7 @@ Quote.createOne = (conn) => async (
   bestBidQty,
   bestAskQty,
   baSpread,
+  exchSeq,
   lastUpdated,
 ) => {
   const res = await conn.query(sql`
@@ -67,6 +71,7 @@ Quote.createOne = (conn) => async (
       best_bid_qty,
       best_ask_qty,
       ba_spread,
+      exch_seq,
       last_updated
     )
     VALUES (${sql.join([
@@ -75,6 +80,7 @@ Quote.createOne = (conn) => async (
     bestBidQty,
     bestAskQty,
     baSpread,
+    exchSeq,
     lastUpdated,
   ], sql`, `)})
     RETURNING id;
@@ -87,6 +93,7 @@ Quote.createOne = (conn) => async (
     bestBidQty,
     bestAskQty,
     baSpread,
+    exchSeq,
     lastUpdated,
   );
 };
@@ -110,6 +117,7 @@ Quote.getLatest = (conn) => async () => {
     result.best_bid_qty,
     result.best_ask_qty,
     result.ba_spread,
+    result.exch_seq,
     result.last_updated,
   );
 };

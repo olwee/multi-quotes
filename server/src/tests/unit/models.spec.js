@@ -34,6 +34,7 @@ describe('# Test Models', () => {
       const bestBidQty = 1000000;
       const bestAskQty = 1000000;
       const baSpread = bestAskPx - bestBidPx;
+      const exchSeq = 0;
       // Timestamp in microseconds
       const lastUpdated = 1595740700000000;
 
@@ -44,6 +45,7 @@ describe('# Test Models', () => {
           bestBidQty,
           bestAskQty,
           baSpread,
+          exchSeq,
           lastUpdated,
         );
         return result;
@@ -55,6 +57,7 @@ describe('# Test Models', () => {
         bestBidQty,
         bestAskQty,
         baSpread,
+        exchSeq,
         lastUpdated,
       });
     });
@@ -66,6 +69,7 @@ describe('# Test Models', () => {
       const bestBidQty = 1000000;
       const bestAskQty = 2000000;
       const baSpread = bestAskPx - bestBidPx;
+      const exchSeq = 1;
       // Timestamp in microseconds
       const lastUpdated = 1595740800000000;
 
@@ -76,6 +80,7 @@ describe('# Test Models', () => {
           bestBidQty,
           bestAskQty,
           baSpread,
+          exchSeq,
           lastUpdated,
         );
         const result = await Models.Quote.getLatest(conn)();
@@ -88,6 +93,7 @@ describe('# Test Models', () => {
         bestBidQty,
         bestAskQty,
         baSpread,
+        exchSeq,
         lastUpdated,
       });
     });
