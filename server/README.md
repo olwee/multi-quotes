@@ -64,16 +64,16 @@ Response
     0,
     {
       "market": "BTCUSDT",
-      "asks: [
+      "asks": [
         ["9681.11", "0.199625"],
       ],
-      "bids: [
+      "bids": [
         ["9672.37", "0.010713"],
       ],
       "timestamp": 1595736351.968364,
     },
     "BTCUSDT",
   ],
-  id: null,
+  "id": null,
 }
 ```
