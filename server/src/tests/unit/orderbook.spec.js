@@ -82,7 +82,6 @@ describe('# Orderbook Unit Tests', () => {
   }); // End Of LimitLevelList Remove
   describe('# Orderbook', () => {
     it('should process LimitLevel Updates #1', () => {
-      //
       const orderbook = Orderbook();
       const feed = Feeds.MultiFeed();
       //
@@ -128,6 +127,70 @@ describe('# Orderbook Unit Tests', () => {
         seq: 2,
         lastUpdated: 0,
       });
-    });
+    }); // End of LimitLevel Updates #1
+    it('should process LimitLevel Updates #2', () => {
+      const orderbook = Orderbook();
+      //
+      const payload1 = {
+        isSnapshot: true,
+        limitLevels: [
+          LimitLevel(100, 10, true),
+          LimitLevel(101, 10, false),
+        ],
+        exchTS: 0,
+        exchSeq: 1,
+      };
+      orderbook.process(payload1);
+      let topQuote = orderbook.getBestQuote();
+      assert.deepEqual(topQuote, {
+        bidPx: 100,
+        bidQty: 10,
+        askPx: 101,
+        askQty: 10,
+        spread: 1,
+        seq: 1,
+        lastUpdated: 0,
+      });
+      const payload2 = {
+        isSnapshot: false,
+        limitLevels: [
+          LimitLevel(99, 10, true),
+          LimitLevel(102, 10, false),
+        ],
+        exchTS: 0,
+        exchSeq: 2,
+      };
+      orderbook.process(payload2);
+      topQuote = orderbook.getBestQuote();
+      assert.deepEqual(topQuote, {
+        bidPx: 100,
+        bidQty: 10,
+        askPx: 101,
+        askQty: 10,
+        spread: 1,
+        seq: 2,
+        lastUpdated: 0,
+      });
+      const payload3 = {
+        isSnapshot: true,
+        limitLevels: [
+          LimitLevel(99, 5, true),
+          LimitLevel(102, 5, false),
+        ],
+        exchTS: 0,
+        exchSeq: 3,
+      };
+      orderbook.process(payload3);
+      topQuote = orderbook.getBestQuote();
+      assert.deepEqual(topQuote, {
+        bidPx: 99,
+        bidQty: 5,
+        askPx: 102,
+        askQty: 5,
+        spread: 3,
+        seq: 3,
+        lastUpdated: 0,
+      });
+    }); // End of LimitLevel Updates #2
   });
 });

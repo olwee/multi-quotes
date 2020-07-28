@@ -14,6 +14,8 @@ const Feed = (
   };
   wsConn.on('open', async () => onConnect({ send, ws: wsConn }));
   wsConn.on('message', async (msg) => onData(msg, { send, ws: wsConn }));
+
+  return wsConn;
 };
 
 export default Feed;

@@ -28,6 +28,7 @@ const MultiFeed = () => {
   };
 
   const handleBookUpdate = (params) => {
+    const isSnapshot = params[0];
     const exchSeq = params[1];
     const bookData = params[2];
     const pair = params[3];
@@ -55,6 +56,7 @@ const MultiFeed = () => {
     const limitLevels = [...limitLevelAsks, ...limitLevelBids];
 
     const payload = {
+      isSnapshot,
       limitLevels,
       exchTS: 0,
       exchSeq,

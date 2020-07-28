@@ -22,38 +22,35 @@ const FeedHandler = ({ ws, pool, Models }) => {
     askQty: 0,
   });
   // const wsURI = process.env.WS_URI;
-  const LOB = Orderbook();
   const { publisher, ...multiFeedConfig } = Feeds.MultiFeed();
   BaseFeed(ws, multiFeedConfig);
+  const LOB = Orderbook();
 
-  publisher.on('book-update', async (updatePayload) => {
-    LOB.process(updatePayload);
+  publisher.on('book-update', (updatePayload) => {
+    // If we get a snapshot,we should flush the whole book
     const localTS = moment.utc().valueOf();
+    LOB.process(updatePayload);
     const bestQuote = LOB.getBestQuote();
     const newQuote = quote(bestQuote);
     if (newQuote.toString() !== lastQuote.toString()) {
-      await pool.connect(async (conn) => {
-        await Models.Quote.createOne(conn)(
-          bestQuote.bidPx,
-          bestQuote.askPx,
-          bestQuote.bidQty,
-          bestQuote.askQty,
-          bestQuote.spread,
-          bestQuote.seq,
-          localTS,
-        );
-      });
+      const persistQuote = async () => {
+        await pool.connect(async (conn) => {
+          await Models.Quote.createOne(conn)(
+            bestQuote.bidPx,
+            bestQuote.askPx,
+            bestQuote.bidQty,
+            bestQuote.askQty,
+            bestQuote.spread,
+            bestQuote.seq,
+            localTS,
+          );
+        });
+      };
+      persistQuote().catch((err) => console.log(err));
       // Update lastQuote
       Object.assign(lastQuote, newQuote);
     }
   });
-  /*
-  pool.connect(async (conn) => {
-
-    const quoteCreator = Models.Quote.createOne(conn);
-
-  });
-  */
 };
 
 export default FeedHandler;

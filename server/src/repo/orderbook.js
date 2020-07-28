@@ -143,10 +143,16 @@ const Orderbook = () => {
   };
 
   const process = ({
+    isSnapshot,
     limitLevels,
     exchTS,
     exchSeq,
   }) => {
+    if (isSnapshot === true) {
+      cache.bids = LimitLevelList(true);
+      cache.asks = LimitLevelList(false);
+      cache.pxMap = {};
+    }
     limitLevels.forEach((limitLevel) => {
       processSingle(limitLevel);
     });
