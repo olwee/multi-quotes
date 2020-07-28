@@ -36,16 +36,22 @@ const MultiFeed = () => {
       return { limitLevels: [], exchTS: 0, exchSeq: -1 };
     }
     const { asks: rawAsks, bids: rawBids } = bookData;
-    const limitLevelAsks = rawAsks.map(([rawPx, rawQty]) => {
-      const px = parseInt(BN(rawPx).times(baseOffset).toFixed(), 10);
-      const qty = parseInt(BN(rawQty).times(pairOffset).toFixed(), 10);
-      return LimitLevel(px, qty, false);
-    });
-    const limitLevelBids = rawBids.map(([rawPx, rawQty]) => {
-      const px = parseInt(BN(rawPx).times(baseOffset).toFixed(), 10);
-      const qty = parseInt(BN(rawQty).times(pairOffset).toFixed(), 10);
-      return LimitLevel(px, qty, true);
-    });
+    let limitLevelAsks = [];
+    if (typeof rawAsks !== 'undefined') {
+      limitLevelAsks = rawAsks.map(([rawPx, rawQty]) => {
+        const px = parseInt(BN(rawPx).times(baseOffset).toFixed(), 10);
+        const qty = parseInt(BN(rawQty).times(pairOffset).toFixed(), 10);
+        return LimitLevel(px, qty, false);
+      });
+    }
+    let limitLevelBids = [];
+    if (typeof rawBids !== 'undefined') {
+      limitLevelBids = rawBids.map(([rawPx, rawQty]) => {
+        const px = parseInt(BN(rawPx).times(baseOffset).toFixed(), 10);
+        const qty = parseInt(BN(rawQty).times(pairOffset).toFixed(), 10);
+        return LimitLevel(px, qty, true);
+      });
+    }
     const limitLevels = [...limitLevelAsks, ...limitLevelBids];
 
     const payload = {

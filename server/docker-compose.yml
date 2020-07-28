@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: pgdb1234
+    ports:
+      - 5432:5432
+
+  app:
+    image: app:1.0.0
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URI=postgresql://postgres:pgdb1234@db:5432
+      - DATA_DIR=/app_data
+      - NODE_ENV=production
+      - PORT=3000
+      - WS_URI=wss://staging-ome-sockets.multi.io
+    entrypoint: ["/app/wait-for-it.sh", "db:5432", "-s", "-t", "5", "--", "npm", "start"]

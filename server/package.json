@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "docker build -t multi-server:$npm_package_version .",
+    "build": "docker build -t app:$npm_package_version .",
     "test": "babel src -d build && mocha build/tests/**/*.spec.js --exit",
     "start": "node build/index.js"
   },
